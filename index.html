@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ボイスデータ 抽選ページ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    #result {
+      margin-top: 24px;
+      font-size: 1.5rem;
+    }
+    #downloads {
+      margin-top: 16px;
+    }
+    a {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 1.1rem;
+    }
+    .small {
+      color: #666;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>ボイスデータ 抽選ページ</h1>
+  <p class="small">URLごとに1回だけ抽選され、結果は固定されます。</p>
+
+  <div id="controls">
+    <button id="drawBtn">抽選する</button>
+  </div>
+
+  <div id="result"></div>
+  <div id="downloads"></div>
+
+  <script>
+    const voiceUrls = [
+      'https://drive.google.com/file/d/1y1KEN45ohEmGTwFcorLn096Qioqs72Rk/view?usp=drive_link',
+      'https://drive.google.com/file/d/1VH_hEKukvqMhoAA1b_wqX764w-_HoIGH/view?usp=drive_link',
+      'https://drive.google.com/file/d/1jWvz3YUWKcn4b3QmFQS1ypuCTnemeUKq/view?usp=drive_link',
+      'https://drive.google.com/file/d/15g4GpvgZDRe5hJ5o-q50LRsFHWaTP2vM/view?usp=drive_link',
+      'https://drive.google.com/file/d/1AttL6fTZL6k5egi-V0VL81JmBfODPmbE/view?usp=drive_link',
+      'https://drive.google.com/file/d/1uotdawXUe0SOcqrX6x3CQhaeqiVjbI5x/view?usp=drive_link',
+      'https://drive.google.com/file/d/16ghwNsTrmfMwsZCa0MIN-MXT34jI7NOm/view?usp=drive_link',
+      'https://drive.google.com/file/d/166O2tknYTO-fPHxOU3D1ZcagHleGVcOS/view?usp=drive_link',
+      'https://drive.google.com/file/d/13zdo3J4ludHIHkZXQh7yHwOIcp8LCEdr/view?usp=drive_link'
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id") || "default";
+    const key = `voice_result_${id}`;
+
+    const resultEl = document.getElementById("result");
+    const downloadsEl = document.getElementById("downloads");
+    const drawBtn = document.getElementById("drawBtn");
+
+    function render(result) {
+      resultEl.textContent = `抽選結果：ボイス No.${result}`;
+      const url = voiceUrls[result - 1];
+      downloadsEl.innerHTML = `<a href="${url}" target="_blank" rel="noopener">ボイス No.${result} をダウンロード</a>`;
+      drawBtn.disabled = true;
+      drawBtn.textContent = "このURLの結果は確定しています";
+    }
+
+    const saved = localStorage.getItem(key);
+
+    if (saved) {
+      render(saved);
+    } else {
+      drawBtn.disabled = false;
+      drawBtn.textContent = "抽選する";
+    }
+
+    drawBtn.addEventListener("click", () => {
+      const savedNow = localStorage.getItem(key);
+      if (savedNow) {
+        render(savedNow);
+        return;
+      }
+
+      const result = Math.floor(Math.random() * 9) + 1;
+      localStorage.setItem(key, String(result));
+      render(result);
+    });
+  </script>
+</body>
+</html>
